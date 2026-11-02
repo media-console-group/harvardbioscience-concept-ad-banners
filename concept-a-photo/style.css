@@ -1,0 +1,303 @@
+/* ── Brand tokens — the ONLY place colors are defined. From the IR concept page's
+   :root (deep, deep-2, accent-2, accent-2-lt). Slide ground = the page's hero gradient. ── */
+:root {
+  --dark:      #0a223c;
+  --dark-2:    color-mix(in srgb, var(--dark) 70%, black);
+  --navy:      #143456;
+  --accent:    #04aeaa;
+  --accent-d:  color-mix(in srgb, var(--accent) 82%, black);
+  --accent-lt: color-mix(in srgb, var(--accent) 45%, white);
+  --mint:      #83e5e0;
+  --gold:      #026fb4;
+  --white:     #ffffff;
+  --cta-ink:   var(--dark-2);  /* teal CTA: dark ink holds contrast, white does not */
+  --font-head: 'Albert Sans', system-ui, sans-serif;
+  --font:      'Albert Sans', system-ui, sans-serif;
+  --serif:     'Spectral', Georgia, serif;
+  --mono:      'DM Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  --ease:      cubic-bezier(0.16,1,0.3,1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:300px; height:600px; overflow:hidden; background:var(--dark); }
+body { font-family:var(--font); -webkit-font-smoothing:antialiased; }
+a { text-decoration:none; color:inherit; }
+button { border:0; background:none; font:inherit; color:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+
+#banner {
+  position:relative;
+  width:300px;
+  height:600px;
+  overflow:hidden;
+  cursor:pointer;
+  background:var(--dark);
+}
+
+/* ── Slide stack ────────────────────────────────────────────────── */
+#slides { position:absolute; inset:0; z-index:1; }
+#slides .defs { position:absolute; width:0; height:0; }
+
+.slide {
+  position:absolute;
+  inset:0;
+  opacity:0;
+  z-index:1;
+  pointer-events:none;
+  transition:opacity 0.9s ease;
+}
+.slide.active { opacity:1; z-index:2; pointer-events:auto; }
+
+/* The IR page's hero ground (its 170deg mobile gradient plus the teal glow), with the crescent
+   mark drawn large around a circular photograph. No Ken Burns: the art stays put, the dot travels. */
+.slide-bg {
+  position:absolute;
+  inset:0;
+  z-index:1;
+  background:
+    radial-gradient(60% 34% at 50% 28%, oklch(0.74 0.11 198 / .42) 0, transparent 72%),
+    linear-gradient(170deg, oklch(0.35 0.1 250) 0, oklch(0.44 0.12 246.5) 55%, oklch(0.56 0.12 225) 100%);
+  user-select:none;
+}
+.slide-bg .art {
+  position:absolute;
+  left:42px; top:48px;
+  width:216px; height:216px;
+  overflow:visible;
+}
+.slide-bg .orbit {
+  transform-box:view-box;
+  transform-origin:300px 300px;
+  animation:orbit 16s linear infinite;
+}
+@keyframes orbit { to { transform:rotate(360deg); } }
+.slide-bg .photo {
+  position:absolute;
+  left:84px; top:90px;
+  width:132px; height:132px;
+  border-radius:50%;
+  object-fit:cover;
+  box-shadow:0 0 0 3px rgba(255,255,255,.16);
+  background:var(--dark);
+  -webkit-user-drag:none;
+}
+.slide-bg .caption {
+  position:absolute;
+  top:236px; right:16px;
+  font-family:var(--mono);
+  font-size:6.6px;
+  letter-spacing:0.04em;
+  color:rgba(255,255,255,0.72);
+}
+
+.slide-scrim-top, .slide-scrim-bottom {
+  position:absolute;
+  left:0; right:0;
+  z-index:2;
+  pointer-events:none;
+}
+.slide-scrim-top {
+  top:0; height:66px;
+  background:linear-gradient(180deg, color-mix(in srgb, var(--dark-2) 70%, transparent) 0%, color-mix(in srgb, var(--dark-2) 0%, transparent) 100%);
+}
+.slide-scrim-bottom {
+  bottom:0; height:352px;
+  background:linear-gradient(0deg, var(--dark) 0%, color-mix(in srgb, var(--dark) 94%, transparent) 46%, color-mix(in srgb, var(--dark) 0%, transparent) 100%);
+}
+
+.slide-copy {
+  position:absolute;
+  inset:0;
+  z-index:3;
+  transform:translateY(12px);
+  transition:transform 0.9s var(--ease);
+}
+.slide.active .slide-copy { transform:translateY(0); }
+
+/* Floating stat chip (per slide) */
+.mid-chip {
+  position:absolute;
+  top:262px; left:18px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 13px 8px 11px;
+  background:color-mix(in srgb, var(--dark) 62%, transparent);
+  border-left:3px solid var(--accent);
+  border-radius:0 3px 3px 0;
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+}
+.chip-num {
+  font-family:var(--font-head);
+  font-weight:800;
+  font-size:19px;
+  color:var(--white);
+  white-space:nowrap;
+}
+.chip-num em { font-style:normal; font-weight:700; font-size:11px; color:var(--mint); }
+.chip-label {
+  font-family:var(--font);
+  font-size:8.4px;
+  line-height:1.25;
+  font-weight:500;
+  color:rgba(255,255,255,0.86);
+}
+
+/* Rotating headline block: top-anchored so every slide's headline lands at the same y */
+.copy-bottom {
+  position:absolute;
+  left:0; right:0;
+  top:316px;
+  padding:0 18px;
+}
+.kicker {
+  font-family:var(--mono);
+  font-weight:500;
+  font-size:8px;
+  letter-spacing:0.09em;
+  text-transform:uppercase;
+  color:var(--mint);
+  margin-bottom:5px;
+}
+.copy-bottom h1 {
+  font-family:var(--serif);
+  font-weight:500;
+  font-size:21px;
+  line-height:1.1;
+  letter-spacing:-0.005em;
+  color:var(--white);
+}
+.copy-bottom h1 em { font-style:italic; color:var(--mint); }
+.copy-bottom p {
+  margin-top:6px;
+  font-size:10.4px;
+  line-height:1.36;
+  color:rgba(255,255,255,0.88);
+  max-width:262px;
+}
+
+/* ── Persistent chrome (never rotates) ─────────────────────────── */
+#top-bar {
+  position:absolute;
+  top:0; left:0; right:0;
+  z-index:5;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:14px 18px 0;
+}
+#logo { display:flex; align-items:center; gap:8px; }
+#logo .mark { width:46px; height:21px; flex:none; }
+#wordmark {
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:11.5px;
+  letter-spacing:0.01em;
+  color:var(--white);
+}
+#eyebrow {
+  font-family:var(--mono);
+  font-weight:500;
+  font-size:7.8px;
+  letter-spacing:0.1em;
+  color:var(--mint);
+}
+
+.nav-arrow {
+  position:absolute;
+  top:144px;
+  width:26px; height:26px;
+  z-index:5;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:color-mix(in srgb, var(--dark) 45%, transparent);
+  border:1px solid rgba(255,255,255,0.22);
+  border-radius:50%;
+  color:rgba(255,255,255,0.92);
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+  transition:background .2s ease, transform .15s ease;
+}
+.nav-arrow svg { width:13px; height:13px; }
+.nav-arrow:active { transform:scale(0.9); background:color-mix(in srgb, var(--accent) 55%, transparent); }
+#arrow-prev { left:10px; }
+#arrow-next { right:10px; }
+
+#bottom-fixed {
+  position:absolute;
+  left:0; right:0; bottom:0;
+  z-index:5;
+  padding:0 18px 11px;
+}
+
+#dots {
+  display:flex;
+  gap:6px;
+  margin-bottom:6px;
+}
+.dot {
+  width:14px; height:3px;
+  border-radius:2px;
+  background:rgba(255,255,255,0.3);
+  transition:background .3s ease, width .3s ease;
+  padding:6px 0;
+  background-clip:content-box;
+  box-sizing:content-box;
+}
+.dot.active { background-color:var(--accent); width:20px; }  /* background-color, not the shorthand: the shorthand resets background-clip and paints the whole 15px hit area as a square */
+
+#cta {
+  margin-top:4px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  width:100%;
+  height:40px;
+  background:var(--accent);
+  border-radius:3px;
+  color:var(--cta-ink);
+  font-family:var(--font-head);
+  font-weight:800;
+  font-size:11.5px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  box-shadow:0 8px 20px color-mix(in srgb, var(--accent) 35%, transparent);
+  animation:cta-pulse 1.8s ease-in-out 2.6s 6;
+}
+#cta-arrow { width:13px; height:13px; }
+
+/* Required disclosure under the CTA: names what is forward-looking and the going-concern history */
+#disclosure {
+  margin:7px -6px 0;
+  font-family:var(--font);
+  font-size:7.4px;
+  letter-spacing:0;
+  line-height:1.2;
+  text-align:center;
+  color:rgba(255,255,255,0.74);
+}
+@keyframes cta-pulse {
+  0%, 100% { box-shadow:0 8px 20px color-mix(in srgb, var(--accent) 35%, transparent); }
+  50%      { box-shadow:0 8px 26px color-mix(in srgb, var(--accent) 65%, transparent), 0 0 0 5px color-mix(in srgb, var(--accent) 12%, transparent); }
+}
+
+/* ── Entrance sequence (initial load only) ─────────────────────── */
+.reveal {
+  opacity:0;
+  transform:translateY(14px);
+  transition:opacity .7s var(--ease), transform .7s var(--ease);
+}
+#banner.is-live .reveal { opacity:1; transform:none; }
+#top-bar[data-delay="0"] { transition-delay:.05s; }
+#bottom-fixed[data-delay="4"] { transition-delay:.55s; }
+
+#click-tag-wrapper { position:absolute; width:0; height:0; overflow:hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .slide-bg .orbit { animation:none; }
+  #cta { animation:none; }
+  .reveal { transition-duration:.01s; transition-delay:0s !important; }
+  .slide, .slide-copy { transition-duration:.2s; }
+}
